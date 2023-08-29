@@ -1,0 +1,68 @@
+<!--Добавление автобуса-->
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Просмотр фильма</title>
+</head>
+<body>
+<form layout:fragment="content">
+  <div>
+    <h3 th:text="'Информация о фильме: ' + ${film.getTitle()}"></h3>
+    <form class="row g-1">
+      <div class="mb-2 row">
+        <label for="title" class="col-sm-2 col-form-label no-border">Название:</label>
+        <div class="col-sm-10">
+          <p th:text="${film.getTitle()}" class="form-control-plaintext" id="title">
+        </div>
+      </div>
+      <div class="mb-2 row">
+        <label for="genre" class="col-sm-2 col-form-label">Жанр:</label>
+        <div class="col-sm-10">
+          <p th:text="${film.getGenre().getGenreTextDisplay()}" class="form-control-plaintext" id="genre">
+        </div>
+      </div>
+      <div class="mb-2 row">
+        <label for="premierYear" class="col-sm-2 col-form-label">Дата выхода:</label>
+        <div class="col-sm-10">
+          <p th:text="${film.getPremierYear()}" class="form-control-plaintext" id="premierYear">
+        </div>
+      </div>
+      <div class="mb-2 row">
+        <label for="country" class="col-sm-2 col-form-label">Страна происхождения:</label>
+        <div class="col-sm-10">
+          <p th:text="${film.getCountry()}" class="form-control-plaintext" id="country">
+        </div>
+      </div>
+
+
+    </form>
+    <hr class="hr"/>
+    <form class="row g-1">
+      <h4 class="mt-3 mb-3" th:text="'Информация об режиссёре(ах)'"></h4>
+      <div th:each="director : ${film.getDirectors()}">
+        <div class="mb-2 row">
+          <label for="fio" class="col-sm-2 col-form-label">ФИО:</label>
+          <div class="col-sm-10">
+            <a class="text-link text-blue" th:href="'/directors/' + ${director.getId()}" th:text="${director.getDirectorFio()}" id="fio"></a>
+          </div>
+        </div>
+        <div class="mb-2 row">
+          <label for="position" class="col-sm-2 col-form-label">Позиция:</label>
+          <div class="col-sm-10">
+            <p th:text="${director.getPosition()}" class="form-control-plaintext" id="position">
+          </div>
+        </div>
+      </div>
+    </form>
+    <hr class="hr"/>
+    <div class="mt-2">
+      <button type="submit" class="btn btn-primary">Смотреть</button>
+      <button type="button" class="btn btn-secondary" onclick="window.history.back()">Назад</button>
+    </div>
+  </div>
+</form>
+</body>
+</html>

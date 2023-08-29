@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>Фильмы в каталоге</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <hr class="hr"/>
+  <h3>Поиск фильма</h3>
+  <form method="POST" th:action="@{/films/search}" th:object="${filmSearchForm}">
+    <div class="mt-0 row g-2">
+      <div class="col-md">
+        <div class="form-floating">
+          <input name="title" type="text" class="form-control" id="title" placeholder="Название фильма">
+          <label for="title">Название фильма</label>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="form-floating">
+          <input name="directorFio" type="text" class="form-control" id="directorFio" placeholder="ФИО режиссёра">
+          <label for="directorFio">Режиссёр</label>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="form-floating">
+          <select class="form-select" name="genre" id="genre">
+            <option selected th:value="null">Выберите фильм из списка</option>
+            <option th:each="genre : ${T(com.dp.homework.films.model.Genre).values()}"
+                    th:value="${genre}" th:text="${genre.getGenreTextDisplay()}"></option>
+          </select>
+          <label for="genre">Жанр</label>
+        </div>
+      </div>
+      <div class="row g-2">
+        <button type="submit" class="btn btn-secondary">Найти фильм</button>
+      </div>
+    </div>
+  </form>
+  <hr class="mt-3 hr"/>
+  <div class="mt-5">
+    <div class="row">
+      <div class="col">
+        <h2>Все фильмы каталога</h2>
+      </div>
+      <div class="col">
+        <a href="/films/add"
+           class="btn btn-success"
+           role="button"
+           style="float: right"
+           aria-disabled="true">Добавить фильм</a>
+      </div>
+    </div>
+    <div>
+      <table class="table table-hover mt-3">
+        <thead>
+        <tr>
+          <th scope="col">Название</th>
+          <th scope="col">Жанр</th>
+          <th scope="col">Страна</th>
+          <th scope="col">Дата выхода</th>
+
+          <th scope="col">Режиссёр(ы)</th>
+          <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="film : ${films}">
+          <td>
+            <a class="text-link text-blue" th:href="'/films/' + ${film.getId()}" th:text="${film.getTitle()}"></a>
+          </td>
+          <td th:text="${film.getGenre().getGenreTextDisplay()}"></td>
+          <td th:text="${film.getCountry()}"></td>
+          <td th:text="${film.getPremierYear()}"></td>
+          <td>
+            <ul>
+              <li th:each="director : ${film.getDirectors()}" th:text="${director.getDirectorFio()}"></li>
+            </ul>
+          </td>
+          <td>
+            <div sec:authorize="isAuthenticated() && (hasRole('ADMIN') || hasRole('MANAGER'))">
+              <a class="btn btn-sm btn-outline-success" th:href="'/films/update/' + ${film.id}">Обновить</a>
+              <a th:if="${!film.isDeleted()}" class="btn btn-sm btn-outline-danger" th:href="'/films/delete/' + ${film.id}"
+                 onclick="return confirm('Вы действительно хотите удалить фильм?');">Удалить</a>
+              <a th:if="${film.isDeleted()}" class="btn btn-sm btn-outline-warning" th:href="'/films/restore/' + ${film.getId()}">Восстановить</a>
+              <a class="btn btn-sm btn-outline-success" th:href="'/films/add-director/' + ${film.getId()}">Добавить режиссёра</a>
+            </div>
+            <a sec:authorize="isAuthenticated() && !hasRole('ADMIN')" class="btn btn-sm btn-outline-success"
+               th:href="'/rent/get-film/' + ${film.id}">Смотреть фильм</a>
+
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <nav aria-label="Pagination" th:if="${films.totalPages gt 0}">
+        <ul class="pagination justify-content-center font-weight-bold">
+          <li class="page-item" th:classappend="${films.number eq 0} ? 'disabled'">
+            <a class="page-link"
+               th:href="@{/films?page={id}(id=${films.number lt 2 ? 1 : films.number})}"
+               aria-label="Previous" title="Previous Page" data-toggle="tooltip">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item" th:classappend="${i eq films.number + 1} ? 'active'"
+              th:each="i : ${#numbers.sequence( 1, films.totalPages, 1)}">
+            <a class="page-link" th:href="@{/films?page={id}(id=${i})}" th:text="${i}"
+               th:title="${'Page '+ i}" data-toggle="tooltip"></a>
+          </li>
+          <li class="page-item" th:classappend="${films.number eq films.totalPages - 1} ? 'disabled'">
+            <a class="page-link"
+               th:href="@{/films?page={id}(id=${films.number + 2})}"
+               aria-label="Next" title="Next Page" data-toggle="tooltip">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
